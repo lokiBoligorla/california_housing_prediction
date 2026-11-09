@@ -1,28 +1,82 @@
-import pickle
-from flask import Flask, request, app, jsonify, url_for, render_template
-import numpy as np
-import pandas as pd
 
-app=Flask(__name__)
-##Load the model
-regmodel= pickle.load(open("regmodel.pkl","rb"))
-scalar= pickle.load(open("scaling.pkl","rb"))
+import pickle
+from flask import Flask, request, jsonify, render_template
+import numpy as np
+
+app = Flask(__name__)
+
+# Load the trained model and scaler
+with open("regmodel.pkl", "rb") as file:
+    regmodel = pickle.load(file)
+
+with open("scaling.pkl", "rb") as file:
+    scalar = pickle.load(file)
+
+
+# California Housing dataset feature order
+FEATURES = [
+    "MedInc",
+    "HouseAge",
+    "AveRooms",
+    "AveBedrms",
+    "Population",
+    "AveOccup",
+    "Latitude",
+    "Longitude"
+]
+
 
 @app.route("/")
 def home():
     return render_template("home.html")
 
-@app.route("/predict_api",methods=["POST"])
+
+# API prediction
+@app.route("/predict_api", methods=["POST"])
 def predict_api():
-    data = request.json["data"]
-    print(data)
-    print(np.array(list(data.values())).reshape(1,-1))
-    new_data = scalar.transform(np.array(list(data.values())).reshape(1,-1))
-    output=regmodel.predict(new_data)
-    print(output[0])
-    return jsonify(output[0])
 
-if __name__=="__main__":
+    data = request.get_json()
+
+    input_data = [float(data["data"][feature]) for feature in FEATURES]
+
+    final_input = np.array(input_data).reshape(1, -1)
+
+    scaled_data = scalar.transform(final_input)
+
+    prediction = regmodel.predict(scaled_data)[0]
+
+    return jsonify({
+        "prediction": float(prediction)
+    })
+
+
+# HTML form prediction
+@app.route("/predict", methods=["POST"])
+def predict():
+
+    try:
+        data = [
+            float(request.form[feature])
+            for feature in FEATURES
+        ]
+
+        final_input = np.array(data).reshape(1, -1)
+
+        scaled_data = scalar.transform(final_input)
+
+        prediction = regmodel.predict(scaled_data)[0]
+
+        return render_template(
+            "home.html",
+            prediction_text="The House Price Prediction is: {:.4f} ($100,000 units)".format(prediction)
+        )
+
+    except (ValueError, KeyError) as e:
+        return render_template(
+            "home.html",
+            prediction_text=f"Invalid input: {e}"
+        )
+
+
+if __name__ == "__main__":
     app.run(debug=True)
-
-

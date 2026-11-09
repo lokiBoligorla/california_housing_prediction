@@ -1,3 +1,117 @@
-<h1>
-    Hello world
-</h1>
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>California House Price Prediction</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Arimo', sans-serif;
+            background: #f2f2f2;
+            text-align: center;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .login {
+            width: 400px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 25px;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 95%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .prediction {
+            margin-top: 20px;
+            font-size: 20px;
+            color: green;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login">
+
+        <h1>California House Price Prediction</h1>
+
+        <!-- Input features for ML prediction -->
+
+        <form action="{{ url_for('predict') }}" method="post">
+
+            <input type="number" step="any" name="MedInc"
+                placeholder="Median Income (MedInc)" required>
+
+            <input type="number" step="any" name="HouseAge"
+                placeholder="House Age" required>
+
+            <input type="number" step="any" name="AveRooms"
+                placeholder="Average Rooms" required>
+
+            <input type="number" step="any" name="AveBedrms"
+                placeholder="Average Bedrooms" required>
+
+            <input type="number" step="any" name="Population"
+                placeholder="Population" required>
+
+            <input type="number" step="any" name="AveOccup"
+                placeholder="Average Occupancy" required>
+
+            <input type="number" step="any" name="Latitude"
+                placeholder="Latitude" required>
+
+            <input type="number" step="any" name="Longitude"
+                placeholder="Longitude" required>
+
+            <br><br>
+
+            <button type="submit">
+                Predict House Price
+            </button>
+
+        </form>
+
+        <div class="prediction">
+            {{ prediction_text }}
+        </div>
+
+    </div>
+
+</body>
+</html>
+```
